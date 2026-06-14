@@ -116,8 +116,19 @@ app.event("message", async ({ event, client }) => {
             });
             
             console.log(`Sent "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}!`)
+
+            await fs.appendFile(
+                "events.log",
+                `<log>[${acronymMatches}] to ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`} from message ${event.text}</log>`
+            );
+
         } catch (err) {
             console.dir(err, { depth: null });
+
+            await fs.appendFile(
+                "errors.log",
+                `<err>${err} - Message: ${event.text}</err>`
+            );
         }
     }
 });
