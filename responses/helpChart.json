@@ -1,0 +1,64 @@
+{
+	"response_type": "ephemeral",
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "/pi-chart OR /pi-bot --chart"
+			},
+			"level": 2
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Back",
+						"emoji": true
+					},
+					"value": "morehelp_help",
+					"action_id": "morehelp_help"
+				}
+			]
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--chart | -c]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "The type of chart to generate. Valid options: ",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "`bar`, `line`, `pie`, `pie3d`, `polar`, `radar`, `bubble`, `graphviz`, `qr`",
+				"verbatim": false
+			}
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--data | -d]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "The data to create the chart with. Format:",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "Comma-separated data, series split by `|`.\n\n`val`,`val`,`val` | `val`,`val`,`val`",
+				"verbatim": false
+			}
+		}
+	]
+}

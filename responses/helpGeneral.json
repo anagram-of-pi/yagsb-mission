@@ -1,0 +1,95 @@
+{
+	"response_type": "ephemeral",
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "/pi-bot-help OR /pi-bot --help"
+			},
+			"level": 2
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`/pi-bot-help`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "Show this help message",
+				"verbatim": false
+			},
+			"actions": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View More",
+						"emoji": false
+					},
+					"action_id": "morehelp_help"
+				}
+			]
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`/pi-bot`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "Talk to the pi-bot",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "`[--help] [--chart]`",
+				"verbatim": false
+			},
+			"actions": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View More",
+						"emoji": false
+					},
+					"action_id": "morehelp_pi-bot"
+				}
+			]
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`/pi-chart`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "!!! <UNFINISHED>\tGenerate an animated chart",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "`[--type {bar|line|...}] [--data \"data\"] ... [--help]`",
+				"verbatim": false
+			},
+			"actions": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View More",
+						"emoji": false
+					},
+					"action_id": "morehelp_chart"
+				}
+			]
+		}
+	]
+}
