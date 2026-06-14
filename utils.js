@@ -1,4 +1,4 @@
-const stringWidth = require("string-width").default;
+import stringWidth from "string-width";
 
 function box(text) {
     const maxLength = 100;
@@ -35,4 +35,4 @@ const lines = wrappedLines;
     return `${topString}\n${textString}\n${bottomString}`;
 }
 
-module.exports = { box };
+export { box };

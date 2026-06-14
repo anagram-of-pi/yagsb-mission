@@ -1,6 +1,7 @@
-const wordListPath = require("word-list").default;
-const fs = require("fs/promises");
-const { box } = require('./utils');
+import wordListPath from "word-list";
+import fs from "fs/promises";
+
+import { box } from "./utils.js";
 
 async function checkFirstLetters(message) {
     try {
@@ -29,4 +30,4 @@ async function checkFirstLetters(message) {
     }
 }
 
-module.exports = { checkFirstLetters };
+export { checkFirstLetters };

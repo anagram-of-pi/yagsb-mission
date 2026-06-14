@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/anagram-of-pi/yagsb-mission/issues"
   },
@@ -22,7 +22,7 @@
     "@slack/bolt": "^4.7.3",
     "axios": "^1.17.0",
     "dotenv": "^17.4.2",
-    "string-width": "^8.2.1",
+    "string-width": "^4.2.3",
     "word-list": "^4.1.0"
   }
 }

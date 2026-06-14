@@ -1,13 +1,11 @@
-require("dotenv").config();
+import "dotenv/config";
 
+import axios from "axios";
+import fs from "fs/promises";
+import { App } from "@slack/bolt";
 
-const axios = require("axios");
-const fs = require("fs/promises");
-const { App } = require("@slack/bolt");
-
-const { box } = require("./utils");
-const { checkFirstLetters } = require("./checkPatterns");
-
+import { box } from "./utils.js";
+import { checkFirstLetters } from "./checkPatterns.js";
 
 /**
  * This is a (slightly modified) AI generated (!) helper function to read json data from a file. 
@@ -106,7 +104,6 @@ app.event("message", async ({ event, client }) => {
         console.log(box(acronymMatches));
 
         try {
-            console.log(await client.auth.test());
             const info = await client.conversations.info({
                 channel: event.channel
             });
@@ -118,7 +115,7 @@ app.event("message", async ({ event, client }) => {
                 text: `Hey, that spells ${acronymMatches}!`,
             });
             
-            console.log(`Sent "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}`)
+            console.log(`Sent "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}!`)
         } catch (err) {
             console.dir(err, { depth: null });
         }
