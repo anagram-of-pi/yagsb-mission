@@ -95,16 +95,33 @@ app.command("/pi-chart", async ({ command, ack, respond }) => {
 //     const parting = responses[Math.floor(Math.random() * responses.length)];
 //     await say(`${parting}!`);
 // });
-app.event("message", async ({ event, say }) => {
+app.event("message", async ({ event, client }) => {
     if (!event.text) return;
     if (event.bot_id || event.subtype) return; // Ignore bot/system messages
     
-    console.log(event.text);
+    console.log(event.text)
     let acronymMatches = await checkFirstLetters(event.text);
     
-    console.log("Result:", acronymMatches);
     if (acronymMatches) {
         console.log(box(acronymMatches));
+
+        try {
+            console.log(await client.auth.test());
+            const info = await client.conversations.info({
+                channel: event.channel
+            });
+
+            console.log(`Sending "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}...`)
+            await client.chat.postMessage({
+                channel: event.channel,
+                thread_ts: event.thread_ts || event.ts,
+                text: `Hey, that spells ${acronymMatches}!`,
+            });
+            
+            console.log(`Sent "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}`)
+        } catch (err) {
+            console.dir(err, { depth: null });
+        }
     }
 });
 
