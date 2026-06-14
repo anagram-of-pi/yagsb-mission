@@ -1,0 +1,38 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Hey, that spells something!",
+				"emoji": true
+			},
+			"level": 3
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Don't want to hear this anymore?",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Disable π in this channel",
+						"emoji": true
+					},
+					"value": "disableinchannel",
+					"action_id": "disableinchannel"
+				}
+			]
+		}
+	]
+}

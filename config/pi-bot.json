@@ -1,0 +1,30 @@
+{
+    "options": {
+        "disable-channel": {
+            "type": "string",
+            "short": "D",
+            "default": ""
+        },
+        "disable-here": {
+            "type": "boolean",
+            "short": "d",
+            "default": false
+        },
+        "enable-channel": {
+            "type": "string",
+            "short": "E",
+            "default": ""
+        },
+        "enable-here": {
+            "type": "boolean",
+            "short": "e",
+            "default": false
+        },
+        "count": {
+            "type": "string",
+            "short": "c",
+            "multiple": true
+        }
+    },
+    "allowPositionals": true
+}

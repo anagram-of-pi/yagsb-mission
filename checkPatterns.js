@@ -1,20 +1,19 @@
-import wordListPath from "word-list";
-import fs from "fs/promises";
-
-import { box } from "./utils.js";
+import { box, readJSON, writeJSON, logToFile } from "./utils.js";
 
 async function checkFirstLetters(message) {
     try {
-        const minLengthThreshold = 4;
-        const words = new Set(
-            (await fs.readFile(wordListPath, 'utf8')).split("\n")
-        );
+        const minLengthThreshold = 5;
+        const data = await readJSON("./wordfreq.json");
+
+        const words = new Set(data.map(([word]) => word));
         
         const messageWords = message.split(" ");
 
         let acronym = "";
         messageWords.forEach(w => {
-            acronym += w[0];
+            if (w && "abcdefghijklmnopqrstuvwxyz".includes(w[0].toLowerCase())) {
+                acronym += w[0];
+            }
         });
 
         acronym = acronym.replace(/[^a-zA-Z]/g, "");

@@ -2,28 +2,69 @@ import "dotenv/config";
 
 import axios from "axios";
 import fs from "fs/promises";
+import { parseArgs } from 'node:util';
 import { App } from "@slack/bolt";
 
-import { box } from "./utils.js";
+import { box, readJSON, writeJSON, logToFile } from "./utils.js";
 import { checkFirstLetters } from "./checkPatterns.js";
 
 /**
- * This is a (slightly modified) AI generated (!) helper function to read json data from a file. 
+ * This is an AI generated (!) helper function to extract the ID from escaped name, e.g. #general, @pi. 
  */
-async function readJSON(filepath) {
-    try {
-        // Read the file as a UTF-8 string
-        const rawData = await fs.readFile(filepath, 'utf8');
+function extractSlackId(text) {
+    const match = String(text).trim().match(/^<([#@])([A-Z0-9]+)(?:\|[^>]+)?>$/i);
+    if (match) {
+        return match[2];
+    }
 
-        // Parse string to JavaScript object
-        const jsonData = JSON.parse(rawData);
+    const plainMatch = String(text).trim().match(/^([CUWGD][A-Z0-9]+)$/i);
+    if (plainMatch) {
+        return plainMatch[1];
+    }
 
-        return jsonData;
-    } catch (error) {
-        console.error('Error reading or parsing file:', error);
-        return;
+    return null;
+}
+
+async function disableInChannel(channelId) {
+    console.log(box(`DISABLING IN "${channelId}"`));
+
+    let channelSettings = await readJSON("./config/channelSettings.json");
+    channelSettings[channelId] = "disabled";
+    writeJSON("./config/channelSettings.json", channelSettings);
+}
+async function enableInChannel(channelId) {
+    console.log(box(`ENABLING IN "${channelId}"`));
+
+    let channelSettings = await readJSON("./config/channelSettings.json");
+    channelSettings[channelId] = "enabled";
+    writeJSON("./config/channelSettings.json", channelSettings);
+}
+async function isEnabled(channelId) {
+    let channelSettings = await readJSON("./config/channelSettings.json");
+
+    if (channelSettings[channelId]) {
+        return channelSettings[channelId] == "enabled";
+    } else {
+        return false;
     }
 }
+
+function parseCommandText(command, config) {
+    try {
+        const args = command.split(/\s+/).filter(item => item !== "");
+        const { values, positionals } = parseArgs({ args, ...config });
+
+        return { values, positionals };
+
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        logToFile(
+            "pi-bot", 
+            `<err>${error}</err>\n`
+        )
+    }
+}
+
 
 
 const app = new App({
@@ -36,14 +77,6 @@ app.error((error) => {
     console.error(error.message);
 });
 
-function parseCommandText(command) {
-    try {
-        return command.text.split(" ");
-    } catch (error) {
-        console.log(`parseCommandText failed due to ${error}. Command: \n\`\`\`${command}\`\`\``);
-        return [];
-    }
-}
 
 
 
@@ -56,19 +89,62 @@ app.command("/pi-bot-help", async ({ ack, respond }) => {
 });
 
 app.command("/pi-bot", async ({ command, ack, respond }) => {
-    const start = Date.now();
     await ack();
-    const latency = Date.now() - start;
-    
-    await respond({ text: `Here in ${latency}ms!` });
+    try {
+        const config = await readJSON("./config/pi-bot.json");
+        const { values, positionals } = parseCommandText(command.text, config);
+
+        if (values["disable-here"]) {
+            const channelId = extractSlackId(command.channel_id);
+            await disableInChannel(channelId);
+            await respond({ text: `π has been disabled.` });
+            await logToFile(
+                "pi-bot",
+                `<disable>π disabled in ${channelId}</disable>\n`
+            )
+        }
+        if (values["disable-channel"] !== "") {
+            const channelId = extractSlackId(values["disable-channel"]);
+            await disableInChannel(channelId);
+            await respond({ text: `π has been disabled.` });
+            await logToFile(
+                "pi-bot",
+                `<disable>π disabled in ${channelId}</disable>\n`
+            )
+        }
+        
+        if (values["enable-here"]) {
+            const channelId = extractSlackId(command.channel_id);
+            await enableInChannel(channelId);
+            await respond({ text: `π has been enabled!` });
+            await logToFile(
+                "pi-bot",
+                `<enable>π enabled in ${channelId}</enable>\n`
+            )
+        }
+        if (values["enable-channel"] !== "") {
+            const channelId = extractSlackId(values["disable-channel"]);
+            await enableInChannel(channelId);
+            await respond({ text: `π has been enabled!` });
+            await logToFile(
+                "pi-bot",
+                `<enable>π enabled in ${channelId}</enable>\n`
+            )
+        }
+    } catch (error) {
+        await respond({ text: `Something has gone wrong. Try again?` });
+        await logToFile(
+            "pi-bot",
+            `<err>${error}</err>\n`
+        )
+    } 
 });
 
 app.command("/pi-chart", async ({ command, ack, respond }) => {
     await ack();
     
-    const params = parseCommandText(command);
-    
-    console.log(params);
+    const config = await readJSON("./config/pi-bot.json");
+    const { values, positionals } = parseCommandText(command.text, config);
     
     const validChartTypes = {"bvg": "Vertical Bar", "lc": "Line", "p": "Pie", "pc": "Concentric Pie", "p3": "3d Pie", "pd": "Donut Pie", "pa": "Polar", "r": "Radar", "bb": "Bubble", "gv": "GraphViz", "qr": "QR Code", "": "", "": ""};
     const validEasing = ["easeInQuad", "easeOutQuad", "easeInOutQuad", "easeInCubic", "easeOutCubic", "easeInOutCubic", "easeInQuart", "easeOutQuart", "easeInOutQuart", "easeInQuint", "easeOutQuint", "easeInOutQuint", "easeInSine", "easeOutSine", "easeInOutSine", "easeInExpo", "easeOutExpo", "easeInOutExpo", "easeInCirc", "easeOutCirc", "easeInOutCirc", "easeInElastic", "easeOutElastic", "easeInOutElastic", "easeInBack", "easeOutBack", "easeInOutBack", "easeInBounce", "easeOutBounce", "easeInOutBounce"];
@@ -87,12 +163,36 @@ app.command("/pi-chart", async ({ command, ack, respond }) => {
 
 
 
-// --- All messages to respond to ---
+// --- All events to respond to ---
 // app.message('goodbye', async ({ say }) => {
 //     const responses = ['Adios', 'Au revoir', 'Farewell'];
 //     const parting = responses[Math.floor(Math.random() * responses.length)];
 //     await say(`${parting}!`);
 // });
+
+app.event("reaction_added", async ({ event, client }) => {
+    if (event.item.type !== "message") return;
+    console.log(box(event.reaction))
+    if (event.reaction !== "upvote4") return;
+    if (event.user === "U0BB4TY5X6C") return;
+    
+    try {
+        console.log("\n\tUpvoting!\n\n\n")
+        await client.conversations.join({ channel: event.item.channel });
+        await client.reactions.add({
+            channel: event.item.channel,
+            timestamp: event.item.ts,
+            name: "upvote"
+        });
+    } catch (error) {
+        console.error(error);
+        logToFile(
+            "upvote",
+            `<err>${error}</err>`
+        )
+    }
+});
+
 app.event("message", async ({ event, client }) => {
     if (!event.text) return;
     if (event.bot_id || event.subtype) return; // Ignore bot/system messages
@@ -102,32 +202,42 @@ app.event("message", async ({ event, client }) => {
     
     if (acronymMatches) {
         console.log(box(acronymMatches));
+        // if (acronymMatches !== "TESTING") return;
 
         try {
             const info = await client.conversations.info({
                 channel: event.channel
             });
 
-            console.log(`Sending "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}...`)
-            await client.chat.postMessage({
-                channel: event.channel,
-                thread_ts: event.thread_ts || event.ts,
-                text: `Hey, that spells ${acronymMatches}!`,
-            });
-            
-            console.log(`Sent "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}!`)
+            let isEnabledInChannel = await isEnabled(event.channel);
 
-            await fs.appendFile(
-                "events.log",
-                `<log>[${acronymMatches}] to ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`} from message ${event.text}</log>`
-            );
+            if (isEnabledInChannel) {
+                let botResponse = await readJSON("./responses/acronym.json");
+                botResponse.blocks[0].text.text = `Hey, that spells ${acronymMatches}!`
+
+                console.log(`Sending "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}...`)
+                await client.chat.postMessage({
+                    channel: event.channel,
+                    thread_ts: event.thread_ts || event.ts,
+                    text: `Hey, that spells ${acronymMatches}!\n\n(You can disable π in this channel with \`\`\`/pi-bot --disable\`\`\`)`,
+                    blocks: botResponse.blocks
+                });
+                console.log(`Sent "${acronymMatches}" in ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`}!`)
+
+                await logToFile(
+                    "acronyms",
+                    `<log>[${acronymMatches}] to ${info.channel?.is_im ? "DM" : `#${info.channel?.name}`} from message ${event.text}</log>\n`
+                );
+            } else {
+                console.log("Not enabled.")
+            }
 
         } catch (err) {
             console.dir(err, { depth: null });
 
-            await fs.appendFile(
-                "errors.log",
-                `<err>${err} - Message: ${event.text}</err>`
+            await logToFile(
+                "acronyms",
+                `<err>${err} - Message: ${event.text}</err>\n`
             );
         }
     }
@@ -168,6 +278,25 @@ app.action("morehelp_chart", async ({ ack, body, client }) => {
             blocks: (await readJSON("./responses/helpChart.json")).blocks
         })
     });
+});
+
+app.action("disableinchannel", async ({ ack, body, client }) => {
+    await ack();
+    try {
+        const channelId = body.container.channel_id;
+        await disableInChannel(channelId);
+        
+        const response = await fetch(body.response_url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                replace_original: true,
+                text: "π has been disabled in this channel."
+            })
+        });
+    } catch (error) {
+        
+    }
 });
 
 
