@@ -7,7 +7,6 @@ import { App } from "@slack/bolt";
 
 import { box, readJSON, writeJSON, logToFile } from "./utils.js";
 import { checkFirstLetters } from "./checkPatterns.js";
-import strict from "node:assert/strict";
 
 /**
  * This is an AI generated (!) helper function to extract the ID from escaped name, e.g. #general, @pi. 
@@ -198,7 +197,7 @@ app.command("/pi-chart", async ({ command, ack, respond }) => {
 
 app.event("reaction_added", async ({ event, client }) => {
     if (event.item.type !== "message") return;
-    console.log(box(event.reaction))
+    console.log(event.reaction)
     if (event.reaction !== "upvote4") return;
     if (event.user === "U0BB4TY5X6C") return;
     
@@ -235,7 +234,7 @@ app.event("message", async ({ event, client }) => {
                 channel: event.channel
             });
 
-            let shouldFire = await isEnabled(event.channel, strict=true) && await isEnabled(event.user_id, strict=false);
+            let shouldFire = (await isEnabled(event.channel, true)) && (await isEnabled(event.user_id, false));
 
             if (shouldFire) {
                 let botResponse = await readJSON("./responses/acronym.json");
