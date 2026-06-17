@@ -5,7 +5,7 @@
 			"type": "header",
 			"text": {
 				"type": "plain_text",
-				"text": "/pi-bot-help OR /pi-bot --help"
+				"text": "/pi-bot-help"
 			},
 			"level": 2
 		},
@@ -47,7 +47,7 @@
 			},
 			"body": {
 				"type": "mrkdwn",
-				"text": "`[--help] [--chart]`",
+				"text": "`[--help] [--disable-{here|me} true] [--disable-channel #channelname] [--enable-{here|me} true] [--enable-channel #channelname] [--log <issue description>]`",
 				"verbatim": false
 			},
 			"actions": [
@@ -71,12 +71,12 @@
 			},
 			"subtitle": {
 				"type": "mrkdwn",
-				"text": "!!! <UNFINISHED>\tGenerate an animated chart",
+				"text": "!!! <UNFINISHED>\tGenerate a styled chart from data",
 				"verbatim": false
 			},
 			"body": {
 				"type": "mrkdwn",
-				"text": "`[--type {bar|line|...}] [--data \"data\"] ... [--help]`",
+				"text": "`[--type \"type\"] [--data \"data\"] ...`",
 				"verbatim": false
 			},
 			"actions": [

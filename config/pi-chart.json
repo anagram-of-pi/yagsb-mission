@@ -1,0 +1,30 @@
+{
+    "options": {
+        "width": {
+            "type": "number",
+            "short": "w",
+            "default": 400
+        },
+        "height": {
+            "type": "number",
+            "short": "h",
+            "default": 300
+        },
+        "enable-channel": {
+            "type": "string",
+            "short": "E",
+            "default": ""
+        },
+        "enable-here": {
+            "type": "boolean",
+            "short": "e",
+            "default": false
+        },
+        "count": {
+            "type": "string",
+            "short": "c",
+            "multiple": true
+        }
+    },
+    "allowPositionals": true
+}

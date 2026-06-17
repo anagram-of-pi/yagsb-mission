@@ -7,6 +7,7 @@ import { App } from "@slack/bolt";
 
 import { box, readJSON, writeJSON, logToFile } from "./utils.js";
 import { checkFirstLetters } from "./checkPatterns.js";
+import strict from "node:assert/strict";
 
 /**
  * This is an AI generated (!) helper function to extract the ID from escaped name, e.g. #general, @pi. 
@@ -25,27 +26,27 @@ function extractSlackId(text) {
     return null;
 }
 
-async function disableInChannel(channelId) {
-    console.log(box(`DISABLING IN "${channelId}"`));
+async function disableId(id) {
+    console.log(box(`DISABLING FOR "${id}"`));
 
     let channelSettings = await readJSON("./config/channelSettings.json");
-    channelSettings[channelId] = "disabled";
+    channelSettings[id] = "disabled";
     writeJSON("./config/channelSettings.json", channelSettings);
 }
-async function enableInChannel(channelId) {
-    console.log(box(`ENABLING IN "${channelId}"`));
+async function enableId(id) {
+    console.log(box(`ENABLING FOR "${id}"`));
 
     let channelSettings = await readJSON("./config/channelSettings.json");
-    channelSettings[channelId] = "enabled";
+    channelSettings[id] = "enabled";
     writeJSON("./config/channelSettings.json", channelSettings);
 }
-async function isEnabled(channelId) {
+async function isEnabled(id, strict=true) {
     let channelSettings = await readJSON("./config/channelSettings.json");
 
-    if (channelSettings[channelId]) {
-        return channelSettings[channelId] == "enabled";
+    if (channelSettings[id]) {
+        return channelSettings[id] == "enabled";
     } else {
-        return false;
+        return !strict;
     }
 }
 
@@ -96,7 +97,7 @@ app.command("/pi-bot", async ({ command, ack, respond }) => {
 
         if (values["disable-here"]) {
             const channelId = extractSlackId(command.channel_id);
-            await disableInChannel(channelId);
+            await disableId(channelId);
             await respond({ text: `π has been disabled.` });
             await logToFile(
                 "pi-bot",
@@ -105,17 +106,26 @@ app.command("/pi-bot", async ({ command, ack, respond }) => {
         }
         if (values["disable-channel"] !== "") {
             const channelId = extractSlackId(values["disable-channel"]);
-            await disableInChannel(channelId);
+            await disableId(channelId);
             await respond({ text: `π has been disabled.` });
             await logToFile(
                 "pi-bot",
                 `<disable>π disabled in ${channelId}</disable>\n`
             )
         }
+        if (values["disable-me"]) {
+            const userId = extractSlackId(command.user_id);
+            await disableId(userId);
+            await respond({ text: `π has been disabled.` });
+            await logToFile(
+                "pi-bot",
+                `<disable>π disabled for user ${userId}</disable>\n`
+            )
+        }
         
         if (values["enable-here"]) {
             const channelId = extractSlackId(command.channel_id);
-            await enableInChannel(channelId);
+            await enableId(channelId);
             await respond({ text: `π has been enabled!` });
             await logToFile(
                 "pi-bot",
@@ -124,15 +134,31 @@ app.command("/pi-bot", async ({ command, ack, respond }) => {
         }
         if (values["enable-channel"] !== "") {
             const channelId = extractSlackId(values["disable-channel"]);
-            await enableInChannel(channelId);
+            await enableId(channelId);
             await respond({ text: `π has been enabled!` });
             await logToFile(
                 "pi-bot",
                 `<enable>π enabled in ${channelId}</enable>\n`
             )
         }
+        if (values["enable-me"]) {
+            const userId = extractSlackId(command.user_id);
+            await enableId(userId);
+            await respond({ text: `π has been enabled!` });
+            await logToFile(
+                "pi-bot",
+                `<enable>π enabled for user ${userId}</enable>\n`
+            )
+        }
+        
+        if (values["log"] !== "") {
+            await logToFile(
+                "report",
+                `<user>${values["log"]}</user>\n`
+            )
+        }
     } catch (error) {
-        await respond({ text: `Something has gone wrong. Try again?` });
+        await respond({ text: `Something has gone wrong. Try again?\n\nIf the issue continues, try \`/pi-bot --log <issue description>\`` });
         await logToFile(
             "pi-bot",
             `<err>${error}</err>\n`
@@ -209,9 +235,9 @@ app.event("message", async ({ event, client }) => {
                 channel: event.channel
             });
 
-            let isEnabledInChannel = await isEnabled(event.channel);
+            let shouldFire = await isEnabled(event.channel, strict=true) && await isEnabled(event.user_id, strict=false);
 
-            if (isEnabledInChannel) {
+            if (shouldFire) {
                 let botResponse = await readJSON("./responses/acronym.json");
                 botResponse.blocks[0].text.text = `Hey, that spells ${acronymMatches}!`
 
@@ -284,7 +310,7 @@ app.action("disableinchannel", async ({ ack, body, client }) => {
     await ack();
     try {
         const channelId = body.container.channel_id;
-        await disableInChannel(channelId);
+        await disableId(channelId);
         
         const response = await fetch(body.response_url, {
             method: "POST",

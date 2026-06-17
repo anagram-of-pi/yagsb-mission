@@ -5,9 +5,17 @@
 			"type": "header",
 			"text": {
 				"type": "plain_text",
-				"text": "/pi-chart OR /pi-bot --chart"
+				"text": "/pi-chart"
 			},
 			"level": 2
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Generate a customizable chart from data."
+			},
+			"level": 4
 		},
 		{
 			"type": "actions",
@@ -28,17 +36,17 @@
 			"type": "card",
 			"title": {
 				"type": "mrkdwn",
-				"text": "`[--chart | -c]`",
+				"text": "`[--width | -w]`",
 				"verbatim": false
 			},
 			"subtitle": {
 				"type": "mrkdwn",
-				"text": "The type of chart to generate. Valid options: ",
+				"text": "The width of the chart in pixels.",
 				"verbatim": false
 			},
 			"body": {
 				"type": "mrkdwn",
-				"text": "`bar`, `line`, `pie`, `pie3d`, `polar`, `radar`, `bubble`, `graphviz`, `qr`",
+				"text": "Must be in range `[10, 2000]` inclusive.",
 				"verbatim": false
 			}
 		},
@@ -46,17 +54,107 @@
 			"type": "card",
 			"title": {
 				"type": "mrkdwn",
-				"text": "`[--data | -d]`",
+				"text": "`[--height | -h]`",
 				"verbatim": false
 			},
 			"subtitle": {
 				"type": "mrkdwn",
-				"text": "The data to create the chart with. Format:",
+				"text": "The height of the chart in pixels.",
 				"verbatim": false
 			},
 			"body": {
 				"type": "mrkdwn",
-				"text": "Comma-separated data, series split by `|`.\n\n`val`,`val`,`val` | `val`,`val`,`val`",
+				"text": "Must be in range `[10, 2000]` inclusive.",
+				"verbatim": false
+			}
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--type | -t]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "The chart type.",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "Valid types: `area`, `bar`, `bubble`, `pie`, `line`, `polar`, `radar`, `scatter`. This flag may be used multiple times to create a `mixed` chart.",
+				"verbatim": false
+			}
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--animation | -a]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "Animation setting to use on the chart",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "This argument is not supported yet.",
+				"verbatim": false
+			}
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--bg-color | -b]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "The background color of the chart.",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "A hex value, including the `#` e.g. `121212`.",
+				"verbatim": false
+			}
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--animation | -a]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "Animation setting to use on the chart.",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "This argument is not supported yet.",
+				"verbatim": false
+			}
+		},
+		{
+			"type": "card",
+			"title": {
+				"type": "mrkdwn",
+				"text": "`[--padding | -p]`",
+				"verbatim": false
+			},
+			"subtitle": {
+				"type": "mrkdwn",
+				"text": "Padding to use for the chart.",
+				"verbatim": false
+			},
+			"body": {
+				"type": "mrkdwn",
+				"text": "Padding in px, or `auto`.",
 				"verbatim": false
 			}
 		}

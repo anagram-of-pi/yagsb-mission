@@ -68,6 +68,7 @@ async function writeJSON(filepath, object) {
 }
 
 async function logToFile(logName, message) {
+    await fs.mkdir("logs", { recursive: true });
     await fs.appendFile(
         `logs/${logName}.log`,
         message

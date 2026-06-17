@@ -10,6 +10,11 @@
             "short": "d",
             "default": false
         },
+        "disable-me": {
+            "type": "boolean",
+            "short": "M",
+            "default": false
+        },
         "enable-channel": {
             "type": "string",
             "short": "E",
@@ -18,6 +23,11 @@
         "enable-here": {
             "type": "boolean",
             "short": "e",
+            "default": false
+        },
+        "enable-me": {
+            "type": "boolean",
+            "short": "m",
             "default": false
         },
         "count": {

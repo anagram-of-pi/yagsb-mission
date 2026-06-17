@@ -21,7 +21,9 @@
   "dependencies": {
     "@slack/bolt": "^4.7.3",
     "axios": "^1.17.0",
+    "chart.js": "^4.5.1",
     "dotenv": "^17.4.2",
+    "skia-canvas": "^3.0.8",
     "string-width": "^4.2.3",
     "word-list": "^4.1.0"
   }
