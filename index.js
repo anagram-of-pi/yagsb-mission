@@ -222,7 +222,18 @@ app.event("message", async ({ event, client }) => {
     if (!event.text) return;
     if (event.bot_id || event.subtype) return; // Ignore bot/system messages
     
-    console.log(event.text)
+    
+    const permaLink = await client.chat.getPermalink({
+        channel: event.channel,
+        message_ts: event.ts,
+    });
+
+    console.log(`\u001B]8;;${permaLink.permalink}\u0007${event.text}\u001B]8;;\u0007`)
+    if (event.channel_type === "im") {
+        console.log(" ^ ^ ^\n")
+    }
+    // console.log(event.text)
+
     let acronymMatches = await checkFirstLetters(event.text);
     
     if (acronymMatches) {
